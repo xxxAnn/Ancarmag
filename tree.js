@@ -30,8 +30,8 @@ class Tree {
             if (!node.has_parents && !node.spouse_is_loaded()) {
                 node.loaded = true
                 let units_req = node.units_required()
-                node.units = units_req/2
-                node.offset = offset
+                node.units = 0.5
+                node.offset = offset + units_req/2
                 offset += units_req
                 node.position_children()
             }

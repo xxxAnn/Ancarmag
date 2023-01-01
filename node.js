@@ -93,12 +93,12 @@ class CharNode {
     }
  
     position_children() {
-        var offset = this.offset
+        var offset = this.offset-this.units_required()/2
         this.__children.forEach(child => {
             child.row = this.row+1
             var units_required = child.units_required()
-            child.units = units_required/2
-            child.offset = offset
+            child.units = 0.5
+            child.offset = offset + units_required/2
             offset += units_required
             child.loaded = true
             child.position_children()
@@ -138,7 +138,7 @@ class CharNode {
     static UNIT_YLENGTH = 10
 
     get_draw_object() {
-        return this.create_node(this.offset * CharNode.UNIT_XLENGTH + 10 + this.units*10, this.row * 1.5 * CharNode.UNIT_YLENGTH + 10, this.units * CharNode.UNIT_XLENGTH, CharNode.UNIT_YLENGTH)
+        return this.create_node(this.offset * CharNode.UNIT_XLENGTH + 10, this.row * 1.5 * CharNode.UNIT_YLENGTH + 10, this.units * CharNode.UNIT_XLENGTH, CharNode.UNIT_YLENGTH)
     }
 }
 
