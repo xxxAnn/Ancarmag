@@ -9,6 +9,7 @@ class Node {
         this.__raw_relations = relations
         this._linkified = false
         this._relations_loaded = false
+        this.loaded = false
         this.__generate_relations()
     }
 
@@ -24,6 +25,7 @@ class Node {
         this.__parents = []
         this.__children = []
         this.__siblings = []
+        this.__spouse = null
         this.__raw_relations.forEach(full_relation => {
             [relation, character_name] = full_relation.replace(" ", "").split(":")
             relation_type = Node.__get_relation_type_as_int(relation) 
@@ -59,6 +61,28 @@ class Node {
         return this.__spouse
     }
 
+    get has_parents() {
+        return this.parents != null
+    }
+
+    spouse_is_loaded() {
+        if (this.__spouse == null) {
+            return false
+        }
+        this.__spouse.loaded
+    }
+
+    units_required() {
+        if (!this._linkified) {
+            return undefined
+        }
+        units = 0
+        this.__children.forEach(
+            ch => { units += Math.min(ch.units_required(), 1) }
+        )
+        return units
+    }
+
     static __relation_matrix = {
         "parent": 1,
         "dad": 1,
@@ -79,8 +103,12 @@ class Node {
     
     // relation: string
     static __get_relation_type_as_int(relation) {
-        if (this.__relation_matrix.contains(relation)) { return this.__relation_matrix[relation] } 
+        if (Node.__relation_matrix.contains(relation)) { return Node.__relation_matrix[relation] } 
         else { return 0 }
+    }
+
+    create_node(x, y, w, h) {
+        return DrawNode(x, y, w, h, this.name)
     }
 }
 
