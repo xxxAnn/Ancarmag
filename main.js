@@ -18,7 +18,7 @@ function init() {
     yunit = screen.height * (1/100)
 
     nodes = [
-        new DrawNode(10, 10, 10, 10)
+        new DrawNode(10, 10, 10, 10, "Fredria Armann")
     ]
 
     update(ctx, nodes, screen)
@@ -59,15 +59,20 @@ function drawNode(ctx, x, y, w, h) {
 }
 
 class DrawNode {
-    constructor(x, y, w, h) {
+    constructor(x, y, w, h, name) {
         this.x = x
         this.y = y
         this.w = w
         this.h = h
+        this.name = name
     }
 
     draw(ctx) {
         drawNode(ctx, this.x, this.y, this.w, this.h)
+        ctx.font = "26px fantasy"
+        ctx.fillStyle = 'white'
+        ctx.textAlign = 'center'
+        ctx.fillText(this.name, this.x*xunit+this.w*xunit/2, this.y*yunit+this.h*yunit/1.5, this.w*xunit)
     }
 
     update_position(delta) {
