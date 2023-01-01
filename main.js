@@ -79,9 +79,10 @@ class DrawNode {
 
 init()
 
-document.documentElement.style.cursor = "grabbing"
 
 window.addEventListener("mousedown", e => {
+    document.documentElement.style.cursor = "grabbing"
+
     CLICK_START_MOUSE_POS = [e.clientX, e.clientY]
     CMOUSE_POS = [e.clientX, e.clientY]
     MOUSE_IS_DOWN = true
@@ -89,6 +90,8 @@ window.addEventListener("mousedown", e => {
 })
 
 window.addEventListener("mouseup", _ => {
+    document.documentElement.style.cursor = "default"
+
     MOUSE_IS_DOWN = false
 })
 
