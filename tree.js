@@ -6,7 +6,7 @@ class Tree {
     }
 
     __generate_links(nodes) {
-        links = {}
+        var links = {}
         nodes.forEach(node => {
             links[node.name] = node
             node.aliases.forEach(alias => {
@@ -17,7 +17,7 @@ class Tree {
     }
     
     __linkify(nodes) {
-        nodes.map(node => {
+        return nodes.map(node => {
             node.linkify(this.__links)
             return node
         })
@@ -25,12 +25,20 @@ class Tree {
 
     draw_objects() {
         // Finding the gen 1 nodes
-        gen1 = []
+        let offset = 0
         this.nodes.forEach(node => {
             if (!node.has_parents && !node.spouse_is_loaded()) {
-                gen1.push(node)
                 node.loaded = true
+                let units_req = node.units_required()
+                node.units = units_req/2
+                node.offset = offset
+                offset += units_req
+                node.position_children()
             }
+            console.log(node)
+        })
+        return this.nodes.map(node => {
+            return node.get_draw_object()
         })
     }
 }

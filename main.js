@@ -17,10 +17,12 @@ function init() {
     xunit = screen.width * (1/100)
     yunit = screen.height * (1/100)
 
-    nodes = [
-        new DrawNode(10, 10, 10, 10, "Fredria Armann")
-    ]
-
+    nodes = new Tree(
+        new CharNode("Leo Vona", [], [], 1),
+        new CharNode("Augev Kahelia", ["Augev"], ["Amiha:daughter","Ennerva:daughter"], 1),
+        new CharNode("Amiha Kahelia", ["Amiha"], ["Augev:father","Ennerva:sister"], 0),
+        new CharNode("Ennerva Kahelia", ["Ennerva"], ["Augev:father", "Amiha:sister"], 0)
+    ).draw_objects()
     update(ctx, nodes, screen)
 }
 
@@ -76,7 +78,6 @@ class DrawNode {
     }
 
     update_position(delta) {
-        console.log(delta)
         this.x -= delta[0]/xunit
         this.y -= delta[1]/yunit
     }

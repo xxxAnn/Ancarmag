@@ -1,4 +1,4 @@
-class Node {
+class CharNode {
     // name: string
     // alias: string
     // relations: array of strisng
@@ -10,14 +10,19 @@ class Node {
         this._linkified = false
         this._relations_loaded = false
         this.loaded = false
+        this.units = 0
+        this.row = 0
+        this.offset = 0
         this.__generate_relations()
     }
 
     linkify(links) {
         this.__parents = this.__parents.map(parent => { return links[parent] })
-        this.__siblings = this.__siblingss.map(parent => { return links[parent] })
+        this.__siblings = this.__siblings.map(parent => { return links[parent] })
         this.__children = this.__children.map(parent => { return links[parent] })
-        this.__spouse = links[this.__spouse]
+        if (this.has_spouse) {
+            this.__spouse = links[this.__spouse]
+        }
         this._linkified = true
     }
 
@@ -27,12 +32,12 @@ class Node {
         this.__siblings = []
         this.__spouse = null
         this.__raw_relations.forEach(full_relation => {
-            [relation, character_name] = full_relation.replace(" ", "").split(":")
-            relation_type = Node.__get_relation_type_as_int(relation) 
+            var [character_name, relation] = full_relation.replace(" ", "").split(":")
+            var relation_type = CharNode.__get_relation_type_as_int(relation) 
             if (relation_type == 1) { this.__parents.push(character_name) }
             else if (relation_type == 2) { this.__spouse = character_name } 
-            else if (relation_type == 3) { this.__children = character_name } 
-            else if (relation_type == 4) { this.__siblings = character_name } 
+            else if (relation_type == 3) { this.__children.push(character_name) } 
+            else if (relation_type == 4) { this.__siblings.push(character_name) } 
         })
         this._relations_loaded = true
         this._linkified = false
@@ -70,7 +75,7 @@ class Node {
     }
 
     spouse_is_loaded() {
-        if (this.has_spouse) {
+        if (!this.has_spouse) {
             return false
         }
         this.__spouse.loaded
@@ -80,11 +85,24 @@ class Node {
         if (!this._linkified) {
             return undefined
         }
-        units = 0
+        var units = 0
         this.__children.forEach(
-            ch => { units += Math.min(ch.units_required(), 1) }
+            ch => { units += Math.max(ch.units_required(), 1) }
         )
-        return units + this.has_spouse ? 1 : 0
+        return Math.max(units, 1) + (this.has_spouse ? 1 : 0)
+    }
+ 
+    position_children() {
+        var offset = this.offset
+        this.__children.forEach(child => {
+            child.row = this.row+1
+            var units_required = child.units_required()
+            child.units = units_required/2
+            child.offset = offset
+            offset += units_required
+            child.loaded = true
+            child.position_children()
+        })
     }
 
     static __relation_matrix = {
@@ -107,12 +125,20 @@ class Node {
     
     // relation: string
     static __get_relation_type_as_int(relation) {
-        if (Node.__relation_matrix.contains(relation)) { return Node.__relation_matrix[relation] } 
+        console.log(relation)
+        if (Object.keys(CharNode.__relation_matrix).includes(relation)) { return CharNode.__relation_matrix[relation] } 
         else { return 0 }
     }
 
     create_node(x, y, w, h) {
-        return DrawNode(x, y, w, h, this.name)
+        return new DrawNode(x, y, w, h, this.name)
+    }
+
+    static UNIT_XLENGTH = 20
+    static UNIT_YLENGTH = 10
+
+    get_draw_object() {
+        return this.create_node(this.offset * CharNode.UNIT_XLENGTH + 10 + this.units*10, this.row * 1.5 * CharNode.UNIT_YLENGTH + 10, this.units * CharNode.UNIT_XLENGTH, CharNode.UNIT_YLENGTH)
     }
 }
 
