@@ -65,8 +65,12 @@ class Node {
         return this.parents != null
     }
 
+    get has_spouse() {
+        return this.__spouse != null
+    }
+
     spouse_is_loaded() {
-        if (this.__spouse == null) {
+        if (this.has_spouse) {
             return false
         }
         this.__spouse.loaded
@@ -80,7 +84,7 @@ class Node {
         this.__children.forEach(
             ch => { units += Math.min(ch.units_required(), 1) }
         )
-        return units
+        return units + this.has_spouse ? 1 : 0
     }
 
     static __relation_matrix = {
